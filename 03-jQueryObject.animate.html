@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Using The End Function</title>  
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="js/jquery-1.8.3.min.js" type="text/javascript"></script>
+    <style>
+        img { position:absolute;} /*in order to use animate left and top, have to be absolutely positioned-->*/
+       
+        #img2 { top:150px;}
+      
+    </style>
+</head>
+<body>    
+  
+    <img id="img1" src="img/logo-v4.jpg" alt="" />
+    <img id="img2" src="img/logo-v4.jpg" alt="" />
+   
+    <script>
+        //#2 advanced continuning...
+        //One way to call .animate(properties [,duration][,easing][,complete]) 
+        //Here properties is PlainObject, duration can be number and 'slow', easing have swing and linear, it returns jQuery        
+        $('#img1').animate({
+            left: '300px'
+        },
+        2000,
+        'swing',
+        function () {
+            $('body').append('We are done!');
+        }); 
+
+        $('#img2').animate({
+            left: '300px'       
+        },
+        2000,
+        'linear');
+
+    </script> 
+</body>
+</html>

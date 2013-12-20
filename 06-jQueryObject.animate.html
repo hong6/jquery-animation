@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Using The End Function</title>  
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+   <!-- <script src="js/jquery-1.8.3.min.js" type="text/javascript"></script>-->
+    <script src="http://code.jquery.com/jquery-2.0.3.js" type="text/javascript"></script>
+    
+    <style>
+        img { position:absolute;} /*in order to use animate left and top, have to be absolutely positioned-->*/
+        #img2 { top: 150px;}    
+        #stopButton{ position:absolute; top:400px; left:420px;}
+    </style>
+</head>
+<body> 
+   
+    <p></p>    
+    <img id="img1" src="img/logo-v4.jpg" alt="" /> 
+
+   
+    <img id="img2" src="img/button360PRL.jpg" alt="" /> 
+    
+    <input id="stopButton" type="button" class="btn" value="stop" />
+    <script>
+        // advanced continuning...
+
+        //ex 1 using chaining
+        $('#img1')
+            .hide(500)
+            .show(500)
+            .animate({ left: '400' }, 500)
+            .queue(function () {                // queue can introduce function in the middle of chains
+                $('p').text("Here some text.");
+                $(this).dequeue();              //important here to continue chain
+            })
+            .delay(2000)
+            .animate({ left: '-=200' }, 500);
+
+
+            //ex 2 stop() and finish()
+            $('#img2')
+            .hide(500)
+            .show(500)
+            .animate({ left: '400' }, 1500)            
+            .delay(2000)
+            .animate({ left: '-=200' }, 1500);
+
+            $('#stopButton').click(function () {
+                //$('#img2').stop();
+                //$('#img2').stop(true); //clean up queue, real stop
+                //$('#img2').stop(true, true); //jump to the end
+                $('#img2').finish(); //jump to the final position, use jquery 2.0.3
+            });
+
+    </script> 
+</body>
+</html>

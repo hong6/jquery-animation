@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>?</title>
+  <link class="jsbin" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/themes/base/jquery-ui.css" rel="stylesheet" type="text/css">
+  <style>body { font-size: 65%; }</style>
+  
+</head>
+<body>
+  
+  <input id="autocomplete">
+  
+  <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+  <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.js"></script>
+  <script>
+//      $("#autocomplete").autocomplete({
+//          source: function (request, response) {
+//              var term = request.term.toLowerCase();
+//              $.ajax({
+//                  dataType: "jsonp",
+//                  url: "https://twitter.com/status/user_timeline/scott_gonzalez.json?count=10",                 
+//                  success: function (data) {
+//                      var tweets = [];
+//                      $.each(data, function () {
+//                          if (this.text.toLowerCase().indexOf(term) >= 0) {
+//                              tweets.push(this.text);
+//                          }
+//                      });
+//                      response(tweets);
+//                  }
+//              });
+//          }
+//      });
+
+      $("#autocomplete").autocomplete({
+          source: function (request, response) {
+              var term = request.term.toLowerCase();
+              $.ajax({
+                  dataType: "jsonp",
+                  url: "http://api.tumblr.com/v2/blog/cultureclub.clubmonaco.com/posts?notes_info=true&type=photo&api_key=4yDqeXjyYkmfNoh4gUZrS3hl3DQ0JWFDX9boHV6Dbkig27i7Nt&limit=8&tag=men",
+                  success: function (data) {
+                      var tweets = [];
+                      $.each(data, function (index, value) {
+                          if (data.response.posts[index].short_url.toLowerCase().indexOf(term) >= 0) {
+                              tweets.push(data.response.posts[index].short_url);
+                          }
+                      });
+                      response(tweets);
+                  }
+              });
+          }
+      });
+
+
+      //      getTumblr: function () {
+      //        jQuery.ajax({
+      //            url: "http://api.tumblr.com/v2/blog/cultureclub.clubmonaco.com/posts?notes_info=true&type=photo&api_key=4yDqeXjyYkmfNoh4gUZrS3hl3DQ0JWFDX9boHV6Dbkig27i7Nt&limit=8&tag=men",
+      //            cache: true,
+      //            dataType: 'jsonp',
+      //            success: function (data) {
+      //                $posturl = jQuery(".blog-url");
+      //                $posturl.each(function (index, value) {
+      //                    jQuery(this).attr('href', data.response.posts[index].short_url).find('.blog-image').attr('src', data.response.posts[index].photos[0].alt_sizes[2].url);
+      //                });
+      //            },
+      //            error: function (jqXHR, textStatus, errorThrown) {
+      //                alert('Error: ' + textStatus + errorThrown);
+      //            }
+      //        });
+      //    };
+
+  </script>
+</body>
+</html>
