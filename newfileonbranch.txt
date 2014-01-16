@@ -1,2 +1,175 @@
-Alec Baldwin's daughter, Ireland Baldwin, stepped out with her boyfriend Slater Trout for their first red carpet outing as a couple on Tuesday, 
-Jan. 14; the model stunned in 
+
+(function (cc_maker, $) {
+
+    var init = function init() {
+        cc_mmNav();
+        cc_buildSlider();
+        cc_getFamilyGridCategory();
+    },
+
+    cc_CategoryID = 30686276,
+    baseURLcategory = "/svc/CatalogServices/CategoryData?format=json&appId=cmus&stoken=5VgENPlDu6ts+n8Rmoj3kA==&storeCode=CMUS&locale=en_US",
+    baseURLproducts = "/svc/CatalogServices/ProductData?format=json&appId=cmus&stoken=5VgENPlDu6ts+n8Rmoj3kA==&storeCode=CMUS&locale=en_US",
+
+    cc_getProductImage = function (prd) {
+        for (var a = 0; a < prd.images.image.length; a++) {
+            if (prd.images.image[a].type == "T167") {
+                return prd.images.image[a].url
+            }
+        }
+    },
+
+    cc_processCategory = function (cdata) {
+        var h = cdata.categoryDetailServiceInfo.categories.category[0];
+        var g = (h.categoryProducts.product.length < 4) ? 4 : h.categoryProducts.product.length;
+
+        var $refinement = jQuery(".refinement");
+        $refinement.find('h5').text(h.title).end().find('a').attr('src', '/category/index.jsp?categoryId=' + h.categoryId);
+
+        var html = [];
+        var li = '<li class="product"><div class="product-photo"><a class="photourl" href=""><img src="" width="167" height="167" alt="" /></a></div><div class="product-details"><div class="product-details-a"><a href=""></a></div><div class="product-price"><a href=""><span>$</span></a></div></div></li>';
+
+        for (var i = 0; i < g; i++) {
+            html.push(li);
+        }
+
+        jQuery('#cc-products').append(html.join(''));
+
+    },
+
+    cc_getUrlFromCategory = function (cdata) {
+        var c = [];
+        var h = cdata.categoryDetailServiceInfo.categories.category[0];
+        var g = (h.categoryProducts.product.length < 4) ? 4 : h.categoryProducts.product.length;
+        for (var f = 0; f < g; f++) {
+            c.push(h.categoryProducts.product[f].productId)
+        }
+        var k = baseURLproducts;
+        for (var e = 0; e < c.length; e++) {
+            k += "&productId=" + c[e]
+        }
+
+        return k;
+    },
+
+    cc_processProducts = function (pdata) {
+        $product = jQuery(".product");
+        $product.each(function (index, value) {
+            var suburl = pdata.products.product[index].productBaseURL + 'productId=' + pdata.products.product[index].productId;
+            jQuery(this).find('.photourl').attr('href', suburl).find('img').attr('src', cc_getProductImage(pdata.products.product[index]));
+            jQuery(this).find('.product-details-a a').attr('href', suburl).text(pdata.products.product[index].productTitle);
+            jQuery(this).find('.product-price a').attr('href', suburl).find('span').text(pdata.products.product[index].productPrice.current);
+        });
+    },
+
+    cc_getCategory = function (options) {
+        if (typeof options !== 'object') {
+            options = {};
+        }
+        options.url = options.url || '';
+       
+        return jQuery.get(options.url, cc_processCategory, 'json');
+    },
+
+    cc_getProducts = function (options) {
+        if (typeof options !== 'object') {
+            options = {};
+        }
+        options.url = options.url || '';
+       
+        return jQuery.get(options.url, cc_processProducts, 'json');
+    },
+    
+    cc_getFamilyGridCategory = function () {
+        //localhost test
+        if (window.location.href.toLowerCase().indexOf("localhost") != -1) {
+
+            jQuery.when(
+                cc_getCategory({ url: 'cm-onecategory.json' })
+            )
+            .done(function (cdata) {
+                cc_getProducts({ url: 'multipleproducts.json' })
+            })
+            .fail(function () {
+
+            });
+
+        } else { //preview and production
+
+            var urlc = baseURLcategory + "&catId=" + cc_CategoryID;
+
+            jQuery.when(
+                cc_getCategory({ url: urlc })
+            )
+            .done(function (cdata) {
+                cc_getProducts({ url: cc_getUrlFromCategory(cdata) })
+            })
+            .fail(function () {
+
+            });
+        }
+    },
+
+    cc_buildSlider = function () {
+
+        jQuery('#cycle-maker').cycle({
+            fx: 'fade',
+            delay: -2000,
+            speed: 500,
+            timeout: 0,
+            pager: '#pager-maker',
+            next: '#next-item',
+            prev: '#prev-item',
+            nowrap: true,
+            before: function (curr, next, opts) {
+                jQuery(this).removeClass('activeSlide');
+            },
+            after: function (curr, next, opts) {
+                jQuery(this).addClass('activeSlide');
+                if (opts.currSlide == 0) { jQuery('#prev-item').addClass('disabled'); } else { jQuery('#prev-item').removeClass('disabled'); }
+                if (opts.nextSlide == 0) { jQuery('#next-item').addClass('disabled'); } else { jQuery('#next-item').removeClass('disabled'); }
+            }
+        });
+
+        jQuery('.pager a').click(function () {
+            var thisPageNumber = jQuery(this).text();
+        });
+
+        jQuery('.cycleNextSlide').css('cursor', 'pointer');
+        jQuery('.cycleNextSlide').click(function () {
+            jQuery('#cycle-maker').cycle(1);
+        });
+
+        jQuery('.mam-slider').waitForImages({
+            waitForAll: true,
+            finished: function () {
+                jQuery('.mam-slider').fadeIn();
+            }
+        });
+    },
+
+    cc_mmNav = function () {
+        var sidebarUS = jQuery('#mam-sidebar.locale-us');
+        var sidebarCA = jQuery('#mam-sidebar.locale-ca');
+        var headlineTxt = jQuery('.mam-profile .headline h2').text().toLowerCase();
+        var navItem = jQuery('#mam-sidebar .navitem');
+        var currLocale = jQuery('#header').attr('class');
+
+        sidebarUS.show();
+
+        navItem.each(function () {
+            thisItem = jQuery(this);
+            thisTxt = thisItem.find('.text').text().toLowerCase();
+
+            if (headlineTxt.indexOf(thisTxt) !== -1) {
+                thisItem.addClass('on');
+            }
+        });
+    }
+
+    //start up
+    jQuery(document).ready(init);
+
+})(window.cc_maker = window.cc_maker || {}, $);
+
+  
